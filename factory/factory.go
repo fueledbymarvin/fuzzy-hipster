@@ -60,24 +60,26 @@ func parseArgs(i interface{}, options []interface{}) (reflect.Value, map[string]
 		return reflect.Value{}, nil, errors.New("Too many options.")
 	}
 	
-	defaultParams := factories[v.Type()]
-	if defaultParams == nil {
-		defaultParams = make(map[string]interface{})
+	params := make(map[string]interface{})
+	if defaultParams, ok := factories[v.Type()]; ok {
+		for key, val := range defaultParams {
+			params[key] = val
+		}
 	}
 	
 	if len(options) == 1 {
-		params, ok := options[0].(map[string]interface{})
+		newParams, ok := options[0].(map[string]interface{})
 		if !ok {
 			return reflect.Value{}, nil, errors.New("Options are not map[string]interface{}.")
 		}
-		if err := checkParams(v, params); err != nil {
+		if err := checkParams(v, newParams); err != nil {
 			return reflect.Value{}, nil, err
 		}
-		for key, val := range params {
-			defaultParams[key] = val
+		for key, val := range newParams {
+			params[key] = val
 		}
 	}
-	return v, defaultParams, nil
+	return v, params, nil
 }
 
 func Build(i interface{}, options ...interface{}) (interface{}, error) {
