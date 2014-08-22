@@ -1,10 +1,9 @@
-package fuzz
+package factory
 
 import (
 	"fmt"
 	"reflect"
 	"errors"
-	"math/rand"
 )
 
 var factories = make(map[reflect.Type]map[string]interface{})
